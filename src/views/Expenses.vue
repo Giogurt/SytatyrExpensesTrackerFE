@@ -1,13 +1,15 @@
 <template>
   <div>
-    Soy el view de expenses
+    <Header/>
+    <Footer/>
   </div>
 </template>
 <script>
+import Header from "@/components/Header.vue";
+import Footer from "@/components/Footer.vue";
 export default {
   name: "Expenses",
-  components: {
-  },
+  components: { Header, Footer },
 };
 </script>
 <style></style>

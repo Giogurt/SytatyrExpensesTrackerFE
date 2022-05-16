@@ -1,18 +1,15 @@
 <template>
-  <div>
-    <Header></Header>
-    <Footer></Footer>
-  </div>
+  <v-app>
+    <v-main>
+      <router-view/>
+    </v-main>
+  </v-app>
 </template>
 
 <script>
-import Header from "./components/Header.vue";
-import Footer from "./components/Footer.vue";
 export default {
   name: "App",
-  components: { Header, Footer },
   data: () => ({
-    //drawer: false,
     //group: null,
   }),
 };
