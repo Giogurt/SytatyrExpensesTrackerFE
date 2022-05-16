@@ -6,13 +6,12 @@
 
       <v-btn
         class="ma-1"
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
         rounded
         text
         dark
       >
-        <span>Expenses</span>
+        <span @click="goToExpenses()">Expenses</span>
       </v-btn>
       <v-btn
         class="ma-1"
@@ -26,15 +25,8 @@
       </v-btn>
       <v-spacer></v-spacer>
 
-      <v-btn
-        class="ma-1"
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        rounded
-        text
-        dark
-      >
-        <span>Logout</span>
+      <v-btn class="ma-1" target="_blank" rounded text dark>
+        <span @click="goToHome()">Logout</span>
       </v-btn>
     </v-app-bar>
 
@@ -73,5 +65,15 @@ export default {
     drawer: false,
     group: null,
   }),
+
+  methods: {
+    goToHome() {
+      this.$router.push({ path: "/" });
+      location.reload();
+    },
+    goToExpenses(){
+      this.$router.push({ path: "/expenses" });
+    }
+  },
 };
 </script>
