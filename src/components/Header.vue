@@ -1,17 +1,18 @@
 <template>
-  <v-app>
+  <div>
     <v-app-bar app color="#75B79E" dark>
-      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
-      <v-app-bar-title>Expenses Tracker </v-app-bar-title>
+      <v-app-bar-nav-icon @click="drawer = true"/>
+      <v-app-bar-title>Expenses Tracker</v-app-bar-title>
 
       <v-btn
         class="ma-1"
+        href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
         rounded
         text
         dark
       >
-        <span @click="goToExpenses()">Expenses</span>
+        <span>Expenses</span>
       </v-btn>
       <v-btn
         class="ma-1"
@@ -25,8 +26,15 @@
       </v-btn>
       <v-spacer></v-spacer>
 
-      <v-btn class="ma-1" target="_blank" rounded text dark>
-        <span @click="goToHome()">Logout</span>
+      <v-btn
+        class="ma-1"
+        href="https://github.com/vuetifyjs/vuetify/releases/latest"
+        target="_blank"
+        rounded
+        text
+        dark
+      >
+        <span>Logout</span>
       </v-btn>
     </v-app-bar>
 
@@ -52,28 +60,18 @@
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
-    <v-main>
-      <router-view />
-    </v-main>
-  </v-app>
+  </div>
 </template>
 
 <script>
 export default {
   name: "Header",
+  props: {
+    test: { type: String, required: false, default: "DX"},
+  },
   data: () => ({
     drawer: false,
     group: null,
   }),
-
-  methods: {
-    goToHome() {
-      this.$router.push({ path: "/" });
-      location.reload();
-    },
-    goToExpenses(){
-      this.$router.push({ path: "/expenses" });
-    }
-  },
 };
 </script>
