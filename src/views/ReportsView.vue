@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { getDailyExpenses } from "@/daos/ExpensesDAO.js";
+import { getDailyExpenses } from "@/services/ExpensesServices.js";
 import Header from "@/components/Header.vue";
 import Report from "@/components/Report.vue";
 import Footer from "@/components/Footer.vue";
