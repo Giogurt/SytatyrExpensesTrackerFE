@@ -4,7 +4,7 @@
     <v-container>
       <v-row align="center">
         <v-col class="d-flex" cols="12" sm="6">
-          <v-btn elevation="2" rounded color="rgb(106, 140, 175)">New Expense</v-btn>
+          <v-btn @click="dialog = true" elevation="2" rounded color="rgb(106, 140, 175)">New Expense</v-btn>
         </v-col>
 
         <v-col class="d-flex" cols="12" sm="6">
@@ -67,7 +67,56 @@
         </template>
       </v-simple-table>
     </v-container>
-   
+
+    <v-dialog v-model="dialog" width="800" persistent>
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">Add Expense</span>
+        </v-card-title>
+
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field label="Recipient" hint="The entity which is going to recieve the money" required>
+                </v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field label="Amount" hint="Amount of money expended" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field label="Reason" hint="Reason to expend the money" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field label="Notes" hint="Extra information" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-select :items="categories" label="Category" required></v-select>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-select :items="paymentMethods" label="Method" required></v-select>
+              </v-col>
+              <v-row justify="center">
+                <v-date-picker v-model="picker"></v-date-picker>
+              </v-row>
+            </v-row>
+          </v-container>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="6" align="center">
+            <v-btn elevation="2" rounded color="rgb(247, 122, 114)"  @click="dialog = false">Cancel</v-btn>
+          </v-col>
+          <v-col cols="12" sm="6" md="6" align="center">
+            <v-btn elevation="2" rounded color="rgb(238, 249, 191)"  @click="dialog = false">Save</v-btn>
+          </v-col>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-container>
       <v-simple-table absolute="true">
         <template v-slot:default>
@@ -85,10 +134,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr >
-              <td>$ {{totalExpenses}}</td>
-              <td>$ {{highestExpense}}</td>
-              <td>$ {{lowestExpense}}</td>
+            <tr>
+              <td>$ {{ totalExpenses }}</td>
+              <td>$ {{ highestExpense }}</td>
+              <td>$ {{ lowestExpense }}</td>
 
             </tr>
           </tbody>
@@ -150,25 +199,29 @@ export default {
 
       highestExpense: '',
       lowestExpense: '',
-      totalExpenses: ''
+      totalExpenses: '',
+      dialog: false,
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      categories: ['Housing', 'Food', 'Clothing', 'Peronal Care', 'Automobile', 'Property Tax', 'Utilities', 'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses', 'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
+      paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer']
     }
   },
 
   methods: {
-    getMax(){
+    getMax() {
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
-        if(temp < element.amount){
+        if (temp < element.amount) {
           temp = element.amount;
         }
       });
 
       this.highestExpense = temp;
     },
-    getMin(){
+    getMin() {
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
-        if(temp > element.amount){
+        if (temp > element.amount) {
           temp = element.amount;
         }
       });
@@ -176,7 +229,7 @@ export default {
       this.lowestExpense = temp;
 
     },
-    getTotal(){
+    getTotal() {
       let temp = 0;
       this.expenses.forEach((element) => {
         temp = temp + element.amount;
@@ -187,7 +240,7 @@ export default {
     }
   },
 
-  mounted: function() {
+  mounted: function () {
     this.getMax();
     this.getMin();
     this.getTotal();
