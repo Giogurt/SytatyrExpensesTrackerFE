@@ -1,12 +1,13 @@
 <template>
   <div>
     <Header/>
-    <Report :expenses="expenses"/>
+    <Report :dayExpenses="dayExpenses" :monthExpenses="monthExpenses"/>
     <Footer/>
   </div>
 </template>
 
 <script>
+import { getDailyExpenses } from "@/daos/ExpensesDAO.js";
 import Header from "@/components/Header.vue";
 import Report from "@/components/Report.vue";
 import Footer from "@/components/Footer.vue";
@@ -14,10 +15,22 @@ export default {
   name: "Reports",
   components: { Header, Report, Footer },
   data: () => ({
-    expenses: [
+    dayExpenses: [
       {
         id: 0,
-        date: "711",
+        date: "2021",
+        amount: 0,
+        recipient: "Caffenio",
+        category: "Cafe XD",
+        reason: "Tenia hambre",
+        method: "Paypal",
+        notes: "No lo haré de nuevo",
+      }
+    ],
+    monthExpenses: [
+      {
+        id: 0,
+        date: new Date().getFullYear(),
         amount: 0,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -27,7 +40,7 @@ export default {
       },
       {
         id: 1,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 1,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -37,7 +50,7 @@ export default {
       },
       {
         id: 2,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 2,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -47,7 +60,7 @@ export default {
       },
       {
         id: 3,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 3,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -57,7 +70,7 @@ export default {
       },
       {
         id: 4,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 4,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -67,7 +80,7 @@ export default {
       },
       {
         id: 5,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 5,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -77,7 +90,7 @@ export default {
       },
       {
         id: 6,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 6,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -87,7 +100,7 @@ export default {
       },
       {
         id: 7,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 7,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -97,7 +110,7 @@ export default {
       },
       {
         id: 8,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 8,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -107,7 +120,7 @@ export default {
       },
       {
         id: 9,
-        date: "711",
+        date: new Date().getFullYear(),
         amount: 9,
         recipient: "Caffenio",
         category: "Cafe XD",
@@ -115,18 +128,10 @@ export default {
         method: "Paypal",
         notes: "No lo haré de nuevo",
       },
-      {
-        id: 10,
-        date: "711",
-        amount: 10,
-        recipient: "Caffenio",
-        category: "Cafe XD",
-        reason: "Tenia hambre",
-        method: "Paypal",
-        notes: "No lo haré de nuevo",
-      },
-    ],
+    ]
   }),
+  
+  async created(){await getDailyExpenses()},
 };
 </script>
 <style></style>
