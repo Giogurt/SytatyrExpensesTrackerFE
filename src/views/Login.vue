@@ -200,7 +200,6 @@ export default {
     async goToHome() {
       if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
-        
       } else {
         console.log("Hola");
         const auth = {
