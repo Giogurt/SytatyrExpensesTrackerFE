@@ -8,7 +8,7 @@
         </v-col>
 
         <v-col class="d-flex" cols="12" sm="6">
-          <v-select :items="monthSlection" label="Select by date" solo></v-select>
+          <v-select v-model="dateSelector" :items="monthSlection" label="Select by date" solo @change="onChange($event)"></v-select>
         </v-col>
       </v-row>
     </v-container>
@@ -201,7 +201,7 @@
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
 import { mapState } from 'vuex';
-import { getAllExpenses } from '../services/ExpensesServices';
+import { getAllExpenses, getDailyExpenses} from '../services/ExpensesServices';
 
 
 export default {
@@ -257,7 +257,7 @@ export default {
     return {
       expenses: [],
 
-      monthSlection: ['See expenses Today', 'See expenses this Month'],
+      monthSlection: ['See all expenses', 'See expenses Today', 'See expenses this Month'],
 
       highestExpense: '',
       lowestExpense: '',
@@ -270,7 +270,8 @@ export default {
         'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses',
         'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
       paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
-      idForEdition: ''
+      idForEdition: '',
+      dateSelector: 'See all expenses'
     }
   },
 
@@ -287,11 +288,32 @@ export default {
       this.picker = this.expenses[index].date;
     },
 
+    onChange (event){
+       console.log(event.target.value);
+    },
+
     async getAllExpenses() {
       let response = await getAllExpenses(this.token, this.id);
       this.expenses = response;
       console.log(response);
 
+    },
+
+    async getDailyExpenses() {
+      let response = await getDailyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
+
+    }
+  },
+
+  watch: {
+    dateSelector(date){
+      if(date == 'See all expenses'){
+        this.getAllExpenses();
+      } else if(date == 'See expenses Today'){
+        this.getDailyExpenses();
+      }
     }
   },
 
