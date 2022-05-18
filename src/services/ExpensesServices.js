@@ -46,3 +46,20 @@ export const addNewEspense = async (token, userId, recipient, amount, reason, ca
         }, config)
         .then(response => (response.data));
 }
+
+export const updateExpense = async (token, expenseId, recipient, amount, reason, category, method, date, notes) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
+    return axios
+        .put(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/${expenseId}`,{
+            recipient: recipient,
+            amount: amount,
+            reason: reason,
+            category: category,
+            method: method,
+            date: date,
+            notes: notes
+        }, config)
+        .then(response => (response.data));
+}

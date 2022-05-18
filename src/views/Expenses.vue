@@ -19,9 +19,7 @@
           <thead>
             <tr>
               <th class="text-left">
-                <p class="font-size-table">
-                  Id
-                </p>
+                Id
               </th>
               <th class="text-left">
                 Date
@@ -160,7 +158,7 @@
             <v-btn elevation="2" rounded color="rgb(247, 122, 114)" @click="dialog2 = false">Cancel</v-btn>
           </v-col>
           <v-col cols="12" sm="6" md="6" align="center">
-            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="dialog2 = false">Save</v-btn>
+            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="updateExpense()">Save</v-btn>
           </v-col>
         </v-card-actions>
       </v-card>
@@ -201,7 +199,7 @@
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
 import { mapState } from 'vuex';
-import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense} from '../services/ExpensesServices';
+import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense, updateExpense} from '../services/ExpensesServices';
 
 
 export default {
@@ -279,7 +277,8 @@ export default {
       pickerAdd: '',
       categoryAdd: '',
       methodAdd: '',
-      notesAdd: ''
+      notesAdd: '',
+      expenseId:''
     }
   },
 
@@ -287,6 +286,7 @@ export default {
 
     editExpense(index) {
       this.dialog2 = true;
+      this.expenseId = this.expenses[index].id;
       this.recipient = this.expenses[index].recipient;
       this.amount = this.expenses[index].amount;
       this.reason = this.expenses[index].reason;
@@ -323,10 +323,17 @@ export default {
 
     async addNewExpense() {
       let response = await addNewEspense(this.token, this.id, this.recipientAdd, this.amountAdd, this.reasonAdd, this.categoryAdd, this.methodAdd, this.pickerAdd,this.notesAdd);
-      this.expenses = response;
-      this.dialog = false
+      this.dialog = false;
       console.log(response);
-    }
+    },
+
+    async updateExpense() {
+      let response = await updateExpense(this.token, this.expenseId, this.recipient, this.amount, this.reason, this.category, this.method, this.picker, this.notes);
+      this.dialog2 = false;
+      console.log(response);
+    },
+
+
   },
 
   watch: {
