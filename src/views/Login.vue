@@ -10,7 +10,7 @@
       </blockquote>
       <h3 class="login-subtitle2">$</h3>
 
-      <form class="form-group" >
+      <form class="form-group">
         <div class="mx-auto">
           <v-icon x-large class="user-icon">{{ icons.mdiAccount }}</v-icon>
           <input
@@ -200,14 +200,16 @@ export default {
     async goToHome() {
       if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
+        
       } else {
-         console.log("Hola");
+        console.log("Hola");
         const auth = {
           username: this.username,
           password: this.password,
         };
         // Correct username is 'foo' and password is 'bar'
-        const url = "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
+        const url =
+          "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
         this.success = false;
         this.error = null;
         try {
