@@ -201,18 +201,13 @@ export default {
       if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
       } else {
-        console.log("Hola");
-        const auth = {
-          username: this.username,
-          password: this.password,
-        };
-        // Correct username is 'foo' and password is 'bar'
         const url =
           "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
         this.success = false;
         this.error = null;
         try {
-          var res = await axios.get(url, { auth }).then((res) => res.data);
+          var res = await axios.post(url, { username: this.username,
+          password: this.password, }).then((res) => res.data);
           console.log(res);
           this.success = true;
           this.$router.push({ path: "/expenses" });
