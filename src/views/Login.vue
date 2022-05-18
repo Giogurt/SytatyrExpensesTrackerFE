@@ -25,11 +25,12 @@
           <v-icon large class="lock-icon">{{ icons.mdiLock }}</v-icon>
           <input
             v-model="password"
-            type="password"
+            :type="type"
             class="password-input"
             placeholder="Password"
             required
           />
+           <v-btn icon @click="showPassword()"><v-icon>{{ btnText }}</v-icon></v-btn>
         </div>
 
         <div class="mx-auto">
@@ -146,7 +147,7 @@
               <div class="mx-auto">
                 <v-icon x-large class="user-icon">{{ icons.mdiEmail }}</v-icon>
                 <input
-                  v-model="emailLogin"
+                  v-model="email"
                   type="email"
                   class="email-input"
                   placeholder="Email"
@@ -156,21 +157,32 @@
               <div class="mx-auto">
                 <v-icon large class="lock-icon">{{ icons.mdiLock }}</v-icon>
                 <input
-                  v-model="passwordLogin2"
-                  type="password"
+                  v-model="password2"
+                  :type="type"
                   class="password-input"
                   placeholder="Password"
                   required
                 />
+                 <v-btn icon @click="showPassword()"><v-icon>{{ btnText }}</v-icon></v-btn>
               </div>
 
               <div class="mx-auto">
                 <v-icon large class="lock-icon">{{ icons.mdiAccount }}</v-icon>
                 <input
-                  v-model="userLogin2"
+                  v-model="username2"
                   type="username"
                   class="password-input"
                   placeholder="Username"
+                  required
+                />
+              </div>
+              <div class="mx-auto">
+                <v-icon large class="lock-icon">{{ icons.mdiAccount }}</v-icon>
+                <input
+                  v-model="name"
+                  type="Name"
+                  class="password-input"
+                  placeholder="Name"
                   required
                 />
               </div>
@@ -188,7 +200,7 @@
 <script>
 import { mdiAccount, mdiLock, mdiEmail } from "@mdi/js";
 import Modal from "@/components/Modal.vue";
-
+import axios from "axios";
 
 export default {
   name: "Login",
@@ -197,22 +209,43 @@ export default {
   },
 
   methods: {
+    showPassword() {
+       if(this.type === 'password') {
+          this.type = 'text'
+           this.btnText = 'mdi-cancel'
+       } else {
+          this.type = 'password'
+          this.btnText = 'mdi-eye'
+       }
+     },
     async goToHome() {
       if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
       } else {
-        
         this.success = false;
         this.error = null;
         try {
-          await this.$store.dispatch("signIn", {username: this.username, password: this.password})
+          await this.$store.dispatch("signIn", {
+            username: this.username,
+            password: this.password,
+          });
           this.success = true;
-          this.$router.push({ path: "/expenses" });
-
+          this.$router.go("/expenses");
         } catch (err) {
-          this.invalidNotification();
+           this.invalidNotification();
           console.log(err.message);
         }
+      }
+    },
+    async signUp() {
+      if (this.email == null || this.username2 == null || this.password2 == null || this.name == null) {
+        this.emptyNotification();
+      } else {
+          const url ="https://sytatyr-expense-tracker-be.herokuapp.com/user/add";
+         var res = await axios.post(url, {username: this.username2, password: this.password2, email : this.email, name: this.name
+        }).then((res) => res.data);
+        console.log(res);
+        location.reload();
       }
     },
     emptyNotification() {
@@ -238,27 +271,18 @@ export default {
     invalidNotification() {
       this.$notify(
         {
-          group: "top",
+          group: "bottom",
           title: "Error!!!",
           text: "Invalid Credentials",
         },
         4000
       );
     },
-    signUp() {
-      if (
-        this.emailLogin == null ||
-        this.userLogin2 == null ||
-        this.passwordLogin2 == null
-      ) {
-        this.emptyNotification();
-      } else {
-        location.reload();
-      }
-    },
   },
 
   data: () => ({
+     type: 'password',
+     btnText: 'mdi-eye',
     showModal: false,
     icons: {
       mdiAccount,
@@ -267,8 +291,7 @@ export default {
     },
     username: "",
     password: "",
-    error: null,
-    success: false,
+    email:"",
   }),
 };
 </script>

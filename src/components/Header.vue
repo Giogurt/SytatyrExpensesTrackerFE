@@ -14,11 +14,11 @@
 
       <v-btn
         class="ma-1"
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
         target="_blank"
         rounded
         text
         dark
+        @click="logout()"
       >
         <span>Logout</span>
       </v-btn>
@@ -60,6 +60,11 @@ export default {
     group: null,
   }),
   methods: {
+    logout(){
+      this.$store.dispatch("signout");
+      this.$router.push("/");
+      location.reload();
+    },
     handleClickOnReports() {
       this.$router.push("/reports");
     },
