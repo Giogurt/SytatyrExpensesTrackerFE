@@ -44,7 +44,12 @@ export default new Vuex.Store({
         console.log(err.message);
         throw new Error("Invalid credentials");
       }
-    }
+    },
+    signout(context){
+      context.commit("saveToken", "");
+      context.commit("saveUserId", "");   
+      sessionStorage.clear();
+     }
   },
   
   modules: {},
