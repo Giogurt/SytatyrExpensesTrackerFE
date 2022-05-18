@@ -1,5 +1,5 @@
 <template>
-  <v-footer padless>
+  <v-footer absolute padless>
     <v-col cols="12" class="justify-center align-center text-center">
       {{ new Date().getFullYear() }} — Sytatyr
     </v-col>

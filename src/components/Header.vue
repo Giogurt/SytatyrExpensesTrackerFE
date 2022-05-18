@@ -1,8 +1,8 @@
 <template>
-  <v-app>
+  <div>
     <v-app-bar app color="#75B79E" dark>
-      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
-      <v-app-bar-title>Expenses Tracker </v-app-bar-title>
+      <v-app-bar-nav-icon @click="drawer = true"/>
+      <v-app-bar-title>Expenses Tracker</v-app-bar-title>
 
       <v-btn
         class="ma-1"
@@ -60,15 +60,15 @@
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>
-    <v-main>
-      <router-view />
-    </v-main>
-  </v-app>
+  </div>
 </template>
 
 <script>
 export default {
   name: "Header",
+  props: {
+    test: { type: String, required: false, default: "DX"},
+  },
   data: () => ({
     drawer: false,
     group: null,

@@ -1,6 +1,5 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-import Expenses from "@/views/Expenses.vue";
 
 Vue.use(VueRouter);
 
@@ -8,8 +7,9 @@ const routes = [
   {
     path: "/expenses",
     name: "Expenses",
-    component: Expenses,
-  },
+    component: () =>
+    import(/* webpackChunkName: "about" */ "../views/Expenses.vue"),
+  }, 
   {
     path: "/about",
     name: "About",
@@ -19,10 +19,17 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
   },
+  {
+    path: "/",
+    name: "Login",
+    component: () =>
+    import(/* webpackChunkName: "about" */ "../views/Login.vue"),
+  },
 ];
 
 const router = new VueRouter({
   routes,
+  mode: 'history'
 });
 
 export default router;
