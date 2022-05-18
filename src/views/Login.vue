@@ -230,7 +230,7 @@ export default {
             password: this.password,
           });
           this.success = true;
-          this.$router.go("/expenses");
+          this.$router.push("/expenses");
         } catch (err) {
            this.invalidNotification();
           console.log(err.message);

@@ -48,6 +48,7 @@ export default new Vuex.Store({
     signout(context){
       context.commit("saveToken", "");
       context.commit("saveUserId", "");   
+      sessionStorage.clear();
      }
   },
   

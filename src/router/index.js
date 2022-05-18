@@ -45,19 +45,22 @@ const router = new VueRouter({
 
 // check if the user is authenticated before using the
 // route. uses metadata "requiresAuth"
-router.beforeEach((to,_, next) => {
+router.beforeEach(async(to,_, next) => {
   console.log("TOKEN: " + store.state.token);
   console.log(to.name);
   if (to.matched.some((record) => record.meta.requiresAuth)) {
     console.log("Intente entrar a ruta priv");
    if (store.state.token === "") {
     console.log("No pude entrar a ruta privada");
+    await setTimeout(() => {console.log("entre")}, 5000);
     next('/');
     }
     console.log("Si pude entrar a ruta priv");
+    await setTimeout(() => {console.log("entre")}, 5000);
     next();
   } else {
     console.log("Intente entrar a ruta publica");
+    await setTimeout(() => {console.log("entre")}, 5000);
     next();
   }
 });
