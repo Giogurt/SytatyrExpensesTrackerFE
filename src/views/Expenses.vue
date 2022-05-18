@@ -295,11 +295,7 @@ export default {
       this.method = this.expenses[index].method;
       this.picker = this.expenses[index].date;
     },
-
-    onChange (event){
-       console.log(event.target.value);
-    },
-
+    
     async getAllExpenses() {
       let response = await getAllExpenses(this.token, this.id);
       this.expenses = response;
@@ -325,12 +321,14 @@ export default {
       let response = await addNewEspense(this.token, this.id, this.recipientAdd, this.amountAdd, this.reasonAdd, this.categoryAdd, this.methodAdd, this.pickerAdd,this.notesAdd);
       this.dialog = false;
       console.log(response);
+      this.$router.go();
     },
 
     async updateExpense() {
       let response = await updateExpense(this.token, this.expenseId, this.recipient, this.amount, this.reason, this.category, this.method, this.picker, this.notes);
       this.dialog2 = false;
       console.log(response);
+      this.$router.go();
     },
 
     async deleteExpense(index) {
