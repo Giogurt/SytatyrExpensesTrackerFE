@@ -78,26 +78,26 @@
           <v-container>
             <v-row>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Recipient" hint="The entity which is going to recieve the money" required>
+                <v-text-field v-model="recipientAdd" label="Recipient" hint="The entity which is going to recieve the money" required>
                 </v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Amount" hint="Amount of money expended" required></v-text-field>
+                <v-text-field v-model="amountAdd" label="Amount" hint="Amount of money expended" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Reason" hint="Reason to expend the money" required></v-text-field>
+                <v-text-field  v-model="reasonAdd" label="Reason" hint="Reason to expend the money" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Notes" hint="Extra information" required></v-text-field>
+                <v-text-field v-model="notesAdd"  label="Notes" hint="Extra information" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-select :items="categories" label="Category" required></v-select>
+                <v-select v-model="categoryAdd"  :items="categories" label="Category" required></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-select :items="paymentMethods" label="Method" required></v-select>
+                <v-select v-model="methodAdd" :items="paymentMethods" label="Method" required></v-select>
               </v-col>
               <v-row justify="center">
-                <v-date-picker v-model="picker"></v-date-picker>
+                <v-date-picker v-model="pickerAdd"></v-date-picker>
               </v-row>
             </v-row>
           </v-container>
@@ -111,7 +111,7 @@
             <v-btn elevation="2" rounded color="rgb(247, 122, 114)" @click="dialog = false">Cancel</v-btn>
           </v-col>
           <v-col cols="12" sm="6" md="6" align="center">
-            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="dialog = false">Save</v-btn>
+            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="addNewExpense()">Save</v-btn>
           </v-col>
         </v-card-actions>
       </v-card>
@@ -201,7 +201,7 @@
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
 import { mapState } from 'vuex';
-import { getAllExpenses, getDailyExpenses, getMonthlyExpenses} from '../services/ExpensesServices';
+import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense} from '../services/ExpensesServices';
 
 
 export default {
@@ -271,7 +271,15 @@ export default {
         'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
       paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
       idForEdition: '',
-      dateSelector: 'See all expenses'
+      dateSelector: 'See all expenses',
+
+      recipientAdd: '',
+      amountAdd: '',
+      reasonAdd: '',
+      pickerAdd: '',
+      categoryAdd: '',
+      methodAdd: '',
+      notesAdd: ''
     }
   },
 
@@ -311,6 +319,13 @@ export default {
       this.expenses = response;
       console.log(response);
 
+    },
+
+    async addNewExpense() {
+      let response = await addNewEspense(this.token, this.id, this.recipientAdd, this.amountAdd, this.reasonAdd, this.categoryAdd, this.methodAdd, this.pickerAdd,this.notesAdd);
+      this.expenses = response;
+      this.dialog = false
+      console.log(response);
     }
   },
 

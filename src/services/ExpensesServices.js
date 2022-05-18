@@ -29,3 +29,20 @@ export const getMonthlyExpenses = async (token, userId) => {
         .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/month/${userId}`, config)
         .then(response => (response.data));
 }
+
+export const addNewEspense = async (token, userId, recipient, amount, reason, category, method, date, notes) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
+    return axios
+        .post(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/${userId}`,{
+            recipient: recipient,
+            amount: amount,
+            reason: reason,
+            category: category,
+            method: method,
+            date: date,
+            notes: notes
+        }, config)
+        .then(response => (response.data));
+}
