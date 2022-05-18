@@ -4,31 +4,14 @@
       <v-row>
         <v-col cols="12" align="center">
           <v-container fluid>
-            <v-select
-              v-model="reportDate"
-              :items="dates"
-              label="Select by day or month"
-              solo
-            ></v-select>
-            <vue-html2pdf
-              :show-layout="true"
-              :float-layout="false"
-              :enable-download="true"
-              :preview-modal="false"
-              :paginate-elements-by-height="1400"
-              filename="expensesReport"
-              :pdf-quality="2"
-              :manual-pagination="false"
-              pdf-format="a4"
-              pdf-orientation="portrait"
-              pdf-content-width="100%"
-              @hasStartedGeneration="hasStartedGeneration()"
-              @hasGenerated="hasGenerated($event)"
-              ref="html2Pdf"
-            >
+            <v-select v-model="reportDate" :items="dates" label="Select by day or month" solo></v-select>
+            <vue-html2pdf :show-layout="true" :float-layout="false" :enable-download="true" :preview-modal="false"
+              :paginate-elements-by-height="1400" filename="expensesReport" :pdf-quality="2" :manual-pagination="false"
+              pdf-format="a4" pdf-orientation="portrait" pdf-content-width="100%"
+              @hasStartedGeneration="hasStartedGeneration()" @hasGenerated="hasGenerated($event)" ref="html2Pdf">
               <section slot="pdf-content">
-                <v-container >
-                  <h2>{{currentDate}}</h2>
+                <v-container>
+                  <h2>{{ currentDate }}</h2>
                   <v-container />
                   <v-divider />
                   <v-simple-table absolute="true">
@@ -122,22 +105,13 @@
             <v-container class="pa-ma">
               <v-row align="center" d-flex justify-space-between mb-6>
                 <v-col cols="6" align="center">
-                  <v-btn elevation="2" rounded @click="generateReport()"
-                    >Export to PDF</v-btn
-                  >
+                  <v-btn elevation="2" rounded @click="generateReport()">Export to PDF</v-btn>
                 </v-col>
                 <v-col cols="6" align="center">
                   <v-row justify="center">
                     <v-dialog v-model="dialog" persistent max-width="600px">
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn
-                          color="#6A8CAF"
-                          elevation="2"
-                          rounded
-                          dark
-                          v-bind="attrs"
-                          v-on="on"
-                        >
+                        <v-btn color="#6A8CAF" elevation="2" rounded dark v-bind="attrs" v-on="on">
                           Send by Email
                         </v-btn>
                       </template>
@@ -148,67 +122,34 @@
                           </v-card-title>
                           <v-card-text>
                             <v-container>
-                              <v-form
-                                ref="emailForm"
-                                v-model="valid"
-                                lazy-validation
-                              >
+                              <v-form ref="emailForm" v-model="valid" lazy-validation>
                                 <v-row>
                                   <v-col cols="12">
-                                    <v-text-field
-                                      v-model="emailFrom"
-                                      name="email"
-                                      :rules="emailFormRules"
-                                      label="From"
-                                      required
-                                    ></v-text-field>
+                                    <v-text-field v-model="emailFrom" name="email" :rules="emailFormRules" label="From"
+                                      required></v-text-field>
                                   </v-col>
                                   <v-col cols="12">
-                                    <v-text-field
-                                      v-model="emailTo"
-                                      name="toEmail"
-                                      :rules="emailFormRules"
-                                      label="To"
-                                      required
-                                    ></v-text-field>
+                                    <v-text-field v-model="emailTo" name="toEmail" :rules="emailFormRules" label="To"
+                                      required></v-text-field>
                                   </v-col>
                                   <v-col cols="12">
-                                    <v-text-field
-                                      v-model="emailSubject"
-                                      name="subject"
-                                      :rules="emailTextRules"
-                                      label="Subject"
-                                      required
-                                    ></v-text-field>
+                                    <v-text-field v-model="emailSubject" name="subject" :rules="emailTextRules"
+                                      label="Subject" required></v-text-field>
                                   </v-col>
                                 </v-row>
                                 <v-row>
-                                  <v-textarea
-                                    v-model="emailText"
-                                    name="emailText"
-                                    label="Email text body"
-                                    value=""
-                                  ></v-textarea>
+                                  <v-textarea v-model="emailText" name="emailText" label="Email text body" value="">
+                                  </v-textarea>
                                 </v-row>
                               </v-form>
                             </v-container>
                           </v-card-text>
                           <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn
-                              color="blue darken-1"
-                              rounded
-                              text
-                              @click="dialog = false"
-                            >
+                            <v-btn color="blue darken-1" rounded text @click="dialog = false">
                               Close
                             </v-btn>
-                            <v-btn
-                              color="blue darken-1"
-                              rounded
-                              text
-                              @click="validate()"
-                            >
+                            <v-btn color="blue darken-1" rounded text @click="validate()">
                               Send
                             </v-btn>
                           </v-card-actions>
@@ -250,10 +191,10 @@ export default {
       },
     }),
     max() {
-      if(this.expenses.length == 0) {
+      if (this.expenses.length == 0) {
         return null;
       }
-      
+
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
         if (temp < element.amount) {
@@ -264,7 +205,7 @@ export default {
       return temp;
     },
     min() {
-      if(this.expenses.length == 0) {
+      if (this.expenses.length == 0) {
         return null;
       }
 
@@ -278,7 +219,7 @@ export default {
       return temp;
     },
     total() {
-      if(this.expenses.length == 0) {
+      if (this.expenses.length == 0) {
         return null;
       }
 
@@ -427,11 +368,16 @@ export default {
 
   watch: {
     reportDate(date) {
+      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+      const d = new Date();
+      let name = month[d.getMonth()];
+
       if (date == "Report by Day") {
-        this.currentDate = "Report of " + new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate()
+        this.currentDate = "Report of " + new Date().getFullYear() + "-" + name + "-" + new Date().getDate()
         this.getDayExpenses()
       } else if (date == "Report by Month") {
-        this.currentDate = "Report of " + new Date().getFullYear() + "-" + new Date().getMonth()
+        this.currentDate = "Report of " + new Date().getFullYear() + "-" + name
         this.getMonthExpenses()
       }
     },
@@ -442,4 +388,5 @@ export default {
   },
 };
 </script>
-<style></style>
+<style>
+</style>
