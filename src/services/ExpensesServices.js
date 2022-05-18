@@ -25,7 +25,7 @@ export const getMonthlyExpenses = async (token, userId) => {
     const config = {
         headers: {Authorization: "Bearer " + token}
     }
-    axios
-        .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/all/${userId}`, config)
+    return axios
+        .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/month/${userId}`, config)
         .then(response => (response.data));
 }

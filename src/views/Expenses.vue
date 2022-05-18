@@ -201,7 +201,7 @@
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
 import { mapState } from 'vuex';
-import { getAllExpenses, getDailyExpenses} from '../services/ExpensesServices';
+import { getAllExpenses, getDailyExpenses, getMonthlyExpenses} from '../services/ExpensesServices';
 
 
 export default {
@@ -304,6 +304,13 @@ export default {
       this.expenses = response;
       console.log(response);
 
+    },
+
+    async getMonthlyExpenses() {
+      let response = await getMonthlyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
+
     }
   },
 
@@ -313,6 +320,8 @@ export default {
         this.getAllExpenses();
       } else if(date == 'See expenses Today'){
         this.getDailyExpenses();
+      }else if (date == 'See expenses this Month'){
+        this.getMonthlyExpenses();
       }
     }
   },
