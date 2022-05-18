@@ -8,7 +8,7 @@
         </v-col>
 
         <v-col class="d-flex" cols="12" sm="6">
-          <v-select :items="monthSlection" label="Select by date" solo></v-select>
+          <v-select v-model="dateSelector" :items="monthSlection" label="Select by date" solo @change="onChange($event)"></v-select>
         </v-col>
       </v-row>
     </v-container>
@@ -19,9 +19,7 @@
           <thead>
             <tr>
               <th class="text-left">
-                <p class="font-size-table">
-                  Id
-                </p>
+                Id
               </th>
               <th class="text-left">
                 Date
@@ -59,7 +57,7 @@
               <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)" @click="editExpense(index)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)">
+              <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)" @click="deleteExpense(index)">
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
             </tr>
@@ -78,26 +76,26 @@
           <v-container>
             <v-row>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Recipient" hint="The entity which is going to recieve the money" required>
+                <v-text-field v-model="recipientAdd" label="Recipient" hint="The entity which is going to recieve the money" required>
                 </v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Amount" hint="Amount of money expended" required></v-text-field>
+                <v-text-field v-model="amountAdd" label="Amount" hint="Amount of money expended" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Reason" hint="Reason to expend the money" required></v-text-field>
+                <v-text-field  v-model="reasonAdd" label="Reason" hint="Reason to expend the money" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field label="Notes" hint="Extra information" required></v-text-field>
+                <v-text-field v-model="notesAdd"  label="Notes" hint="Extra information" required></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-select :items="categories" label="Category" required></v-select>
+                <v-select v-model="categoryAdd"  :items="categories" label="Category" required></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-select :items="paymentMethods" label="Method" required></v-select>
+                <v-select v-model="methodAdd" :items="paymentMethods" label="Method" required></v-select>
               </v-col>
               <v-row justify="center">
-                <v-date-picker v-model="picker"></v-date-picker>
+                <v-date-picker v-model="pickerAdd"></v-date-picker>
               </v-row>
             </v-row>
           </v-container>
@@ -111,7 +109,7 @@
             <v-btn elevation="2" rounded color="rgb(247, 122, 114)" @click="dialog = false">Cancel</v-btn>
           </v-col>
           <v-col cols="12" sm="6" md="6" align="center">
-            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="dialog = false">Save</v-btn>
+            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="addNewExpense()">Save</v-btn>
           </v-col>
         </v-card-actions>
       </v-card>
@@ -160,7 +158,7 @@
             <v-btn elevation="2" rounded color="rgb(247, 122, 114)" @click="dialog2 = false">Cancel</v-btn>
           </v-col>
           <v-col cols="12" sm="6" md="6" align="center">
-            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="dialog2 = false">Save</v-btn>
+            <v-btn elevation="2" rounded color="rgb(238, 249, 191)" @click="updateExpense()">Save</v-btn>
           </v-col>
         </v-card-actions>
       </v-card>
@@ -184,9 +182,9 @@
           </thead>
           <tbody>
             <tr>
-              <td>$ {{ totalExpenses }}</td>
-              <td>$ {{ highestExpense }}</td>
-              <td>$ {{ lowestExpense }}</td>
+              <td>$ {{ total }}</td>
+              <td>$ {{ max }}</td>
+              <td>$ {{ min }}</td>
 
             </tr>
           </tbody>
@@ -200,8 +198,8 @@
 <script>
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
-import axios from "axios";
 import { mapState } from 'vuex';
+import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense, updateExpense, deleteExpense} from '../services/ExpensesServices';
 
 
 export default {
@@ -211,52 +209,58 @@ export default {
     Footer
   },
 
-  computed: mapState({
-    token(state){
-      return state.token;
-    }
-  }),
+  computed: {
+    ...mapState({
+      token(state) {
+        return state.token;
+      },
+      id(state) {
+        return state.userId;
+      }
+    }),
+    max() {
+      let temp = this.expenses[0].amount;
+      this.expenses.forEach((element) => {
+        if (temp < element.amount) {
+          temp = element.amount;
+        }
+      });
+
+      return temp;
+    },
+    min() {
+      let temp = this.expenses[0].amount;
+      this.expenses.forEach((element) => {
+        if (temp > element.amount) {
+          temp = element.amount;
+        }
+      });
+
+      return temp;
+
+    },
+    total() {
+      let temp = 0;
+      this.expenses.forEach((element) => {
+        temp = temp + element.amount;
+      });
+
+      return temp;
+
+    },
+
+  },
 
   data() {
     return {
-      expenses: [
-        {
-          id: 1,
-          date: "2020-06-04",
-          amount: 100,
-          recipient: "Caffenio",
-          category: "Food",
-          reason: "Tenia hambre",
-          method: "Credit",
-          notes: "No lo haré de nuevo",
-        },
-        {
-          id: 2,
-          date: "2000-08-07",
-          amount: 460,
-          recipient: "Caffenio",
-          category: "Insurance",
-          reason: "Tenia hambre",
-          method: "Debit",
-          notes: "No lo haré de nuevo",
-        },
-        {
-          id: 3,
-          date: "2000-10-02",
-          amount: 250,
-          recipient: "Caffenio",
-          category: "Housing",
-          reason: "Tenia hambre",
-          method: "Cash",
-          notes: "No lo haré de nuevo",
-        },
-      ],
+      expenses: [],
 
-      monthSlection: ['See expenses Today', 'See expenses this Month'],
+      monthSlection: ['See all expenses', 'See expenses Today', 'See expenses this Month'],
 
       highestExpense: '',
       lowestExpense: '',
       totalExpenses: '',
+
       dialog: false,
       dialog2: false,
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
@@ -265,44 +269,24 @@ export default {
         'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
       paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
       idForEdition: '',
-      userToken: ''
+      dateSelector: 'See all expenses',
+
+      recipientAdd: '',
+      amountAdd: '',
+      reasonAdd: '',
+      pickerAdd: '',
+      categoryAdd: '',
+      methodAdd: '',
+      notesAdd: '',
+      expenseId:''
     }
   },
 
   methods: {
-    getMax() {
-      let temp = this.expenses[0].amount;
-      this.expenses.forEach((element) => {
-        if (temp < element.amount) {
-          temp = element.amount;
-        }
-      });
-
-      this.highestExpense = temp;
-    },
-    getMin() {
-      let temp = this.expenses[0].amount;
-      this.expenses.forEach((element) => {
-        if (temp > element.amount) {
-          temp = element.amount;
-        }
-      });
-
-      this.lowestExpense = temp;
-
-    },
-    getTotal() {
-      let temp = 0;
-      this.expenses.forEach((element) => {
-        temp = temp + element.amount;
-      });
-
-      this.totalExpenses = temp;
-
-    },
 
     editExpense(index) {
       this.dialog2 = true;
+      this.expenseId = this.expenses[index].id;
       this.recipient = this.expenses[index].recipient;
       this.amount = this.expenses[index].amount;
       this.reason = this.expenses[index].reason;
@@ -311,36 +295,67 @@ export default {
       this.method = this.expenses[index].method;
       this.picker = this.expenses[index].date;
     },
-
+    
     async getAllExpenses() {
+      let response = await getAllExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
 
-      const url =
-        "https://sytatyr-expense-tracker-be.herokuapp.com/expense";
-      this.success = false;
-      this.error = null;
-      try {
-        var res = await axios.post(url, {
-          username: this.username,
-          password: this.password,
-        }).then((res) => res.data);
-        console.log(res.token);
-        this.success = true;
+    },
 
-        this.$router.push({ path: "/expenses" });
-        
+    async getDailyExpenses() {
+      let response = await getDailyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
 
-      } catch (err) {
-        this.error = err.message;
+    },
+
+    async getMonthlyExpenses() {
+      let response = await getMonthlyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
+
+    },
+
+    async addNewExpense() {
+      let response = await addNewEspense(this.token, this.id, this.recipientAdd, this.amountAdd, this.reasonAdd, this.categoryAdd, this.methodAdd, this.pickerAdd,this.notesAdd);
+      this.dialog = false;
+      console.log(response);
+      this.$router.go();
+    },
+
+    async updateExpense() {
+      let response = await updateExpense(this.token, this.expenseId, this.recipient, this.amount, this.reason, this.category, this.method, this.picker, this.notes);
+      this.dialog2 = false;
+      console.log(response);
+      this.$router.go();
+    },
+
+    async deleteExpense(index) {
+      this.expenseId = this.expenses[index].id;
+      let response = await deleteExpense(this.token, this.expenseId);
+      console.log(response);
+      this.$router.go();
+    },
+
+
+  },
+
+  watch: {
+    dateSelector(date){
+      if(date == 'See all expenses'){
+        this.getAllExpenses();
+      } else if(date == 'See expenses Today'){
+        this.getDailyExpenses();
+      }else if (date == 'See expenses this Month'){
+        this.getMonthlyExpenses();
       }
-
     }
   },
 
-  mounted: function () {
-    this.getMax();
-    this.getMin();
-    this.getTotal();
-  },
+  async mounted() {
+    await this.getAllExpenses();
+  }
 
 }
 
