@@ -63,7 +63,6 @@ export default {
     logout(){
       this.$store.dispatch("signout");
       this.$router.push("/");
-      location.reload();
     },
     handleClickOnReports() {
       this.$router.push("/reports");

@@ -4,11 +4,28 @@
       <v-row>
         <v-col cols="12" align="center">
           <v-container fluid>
-            <v-select v-model="reportDate" :items="dates" label="Select by day or month" solo></v-select>
-            <vue-html2pdf :show-layout="true" :float-layout="false" :enable-download="true" :preview-modal="false"
-              :paginate-elements-by-height="1400" filename="expensesReport" :pdf-quality="2" :manual-pagination="false"
-              pdf-format="a4" pdf-orientation="portrait" pdf-content-width="100%"
-              @hasStartedGeneration="hasStartedGeneration()" @hasGenerated="hasGenerated($event)" ref="html2Pdf">
+            <v-select
+              v-model="reportDate"
+              :items="dates"
+              label="Select by day or month"
+              solo
+            ></v-select>
+            <vue-html2pdf
+              :show-layout="true"
+              :float-layout="false"
+              :enable-download="true"
+              :preview-modal="false"
+              :paginate-elements-by-height="1400"
+              filename="expensesReport"
+              :pdf-quality="2"
+              :manual-pagination="false"
+              pdf-format="a4"
+              pdf-orientation="portrait"
+              pdf-content-width="100%"
+              @hasStartedGeneration="hasStartedGeneration()"
+              @hasGenerated="hasGenerated($event)"
+              ref="html2Pdf"
+            >
               <section slot="pdf-content">
                 <v-container>
                   <h2>{{ currentDate }}</h2>
@@ -105,13 +122,22 @@
             <v-container class="pa-ma">
               <v-row align="center" d-flex justify-space-between mb-6>
                 <v-col cols="6" align="center">
-                  <v-btn elevation="2" rounded @click="generateReport()">Export to PDF</v-btn>
+                  <v-btn elevation="2" rounded @click="generateReport()"
+                    >Export to PDF</v-btn
+                  >
                 </v-col>
                 <v-col cols="6" align="center">
                   <v-row justify="center">
                     <v-dialog v-model="dialog" persistent max-width="600px">
                       <template v-slot:activator="{ on, attrs }">
-                        <v-btn color="#6A8CAF" elevation="2" rounded dark v-bind="attrs" v-on="on">
+                        <v-btn
+                          color="#6A8CAF"
+                          elevation="2"
+                          rounded
+                          dark
+                          v-bind="attrs"
+                          v-on="on"
+                        >
                           Send by Email
                         </v-btn>
                       </template>
@@ -122,23 +148,47 @@
                           </v-card-title>
                           <v-card-text>
                             <v-container>
-                              <v-form ref="emailForm" v-model="valid" lazy-validation>
+                              <v-form
+                                ref="emailForm"
+                                v-model="valid"
+                                lazy-validation
+                              >
                                 <v-row>
                                   <v-col cols="12">
-                                    <v-text-field v-model="emailFrom" name="email" :rules="emailFormRules" label="From"
-                                      required></v-text-field>
+                                    <v-text-field
+                                      v-model="emailFrom"
+                                      name="email"
+                                      :rules="emailFormRules"
+                                      label="From"
+                                      required
+                                    ></v-text-field>
                                   </v-col>
                                   <v-col cols="12">
-                                    <v-text-field v-model="emailTo" name="toEmail" :rules="emailFormRules" label="To"
-                                      required></v-text-field>
+                                    <v-text-field
+                                      v-model="emailTo"
+                                      name="toEmail"
+                                      :rules="emailFormRules"
+                                      label="To"
+                                      required
+                                    ></v-text-field>
                                   </v-col>
                                   <v-col cols="12">
-                                    <v-text-field v-model="emailSubject" name="subject" :rules="emailTextRules"
-                                      label="Subject" required></v-text-field>
+                                    <v-text-field
+                                      v-model="emailSubject"
+                                      name="subject"
+                                      :rules="emailTextRules"
+                                      label="Subject"
+                                      required
+                                    ></v-text-field>
                                   </v-col>
                                 </v-row>
                                 <v-row>
-                                  <v-textarea v-model="emailText" name="emailText" label="Email text body" value="">
+                                  <v-textarea
+                                    v-model="emailText"
+                                    name="emailText"
+                                    label="Email text body"
+                                    value=""
+                                  >
                                   </v-textarea>
                                 </v-row>
                               </v-form>
@@ -146,10 +196,20 @@
                           </v-card-text>
                           <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="blue darken-1" rounded text @click="dialog = false">
+                            <v-btn
+                              color="blue darken-1"
+                              rounded
+                              text
+                              @click="dialog = false"
+                            >
                               Close
                             </v-btn>
-                            <v-btn color="blue darken-1" rounded text @click="validate()">
+                            <v-btn
+                              color="blue darken-1"
+                              rounded
+                              text
+                              @click="validate()"
+                            >
                               Send
                             </v-btn>
                           </v-card-actions>
@@ -178,6 +238,7 @@ import {
   getDailyExpenses,
   getMonthlyExpenses,
 } from "@/services/ExpensesServices.js";
+import { sendEmail } from "@/services/EmailJS.js";
 export default {
   name: "Report",
 
@@ -314,7 +375,13 @@ export default {
   },
 
   data: () => ({
-    currentDate: "Report of " + new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate(),
+    currentDate:
+      "Report of " +
+      new Date().getFullYear() +
+      "-" +
+      new Date().getMonth() +
+      "-" +
+      new Date().getDate(),
     expenses: [],
     dialog: false,
     successAlert: false,
@@ -344,10 +411,22 @@ export default {
       this.$refs.html2Pdf.generatePdf();
     },
     // Method used to validate the inputs of the email form in the dialog.
-    validate() {
+    async validate() {
       if (this.$refs.emailForm.validate()) {
         this.dialog = false;
-        this.successAlert = true;
+        
+        const total = `Este fue tu gasto total $${this.total}`
+        const max = `Este fue tu gasto mínimo $${this.total}`
+        const min = `Este fue tu gasto máximo $${this.total}`
+
+        const emailBody = `${total} -\n ${max} -\n ${min} -\n ${this.emailText}`
+        try {
+          await sendEmail(this.emailTo, emailBody);
+          this.successAlert = true;
+        } catch(err) {
+          console.log(err)
+        }
+
       }
     },
     async getDayExpenses() {
@@ -368,17 +447,36 @@ export default {
 
   watch: {
     reportDate(date) {
-      const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      const month = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
 
       const d = new Date();
       let name = month[d.getMonth()];
 
       if (date == "Report by Day") {
-        this.currentDate = "Report of " + new Date().getFullYear() + "-" + name + "-" + new Date().getDate()
-        this.getDayExpenses()
+        this.currentDate =
+          "Report of " +
+          new Date().getFullYear() +
+          "-" +
+          name +
+          "-" +
+          new Date().getDate();
+        this.getDayExpenses();
       } else if (date == "Report by Month") {
-        this.currentDate = "Report of " + new Date().getFullYear() + "-" + name
-        this.getMonthExpenses()
+        this.currentDate = "Report of " + new Date().getFullYear() + "-" + name;
+        this.getMonthExpenses();
       }
     },
   },
@@ -388,5 +486,4 @@ export default {
   },
 };
 </script>
-<style>
-</style>
+<style></style>
