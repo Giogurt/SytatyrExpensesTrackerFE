@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { getDailyExpenses } from "@/services/ExpensesServices.js";
+import { getMonthlyExpenses } from "@/services/ExpensesServices.js";
 import Header from "@/components/Header.vue";
 import Report from "@/components/Report.vue";
 import Footer from "@/components/Footer.vue";
@@ -27,6 +27,7 @@ export default {
         notes: "No lo haré de nuevo",
       }
     ],
+    /*
     monthExpenses: [
       {
         id: 0,
@@ -129,9 +130,11 @@ export default {
         notes: "No lo haré de nuevo",
       },
     ]
+    */
+    monthExpenses: []
   }),
   
-  async created(){await getDailyExpenses()},
+  async created(){await getMonthlyExpenses()},
 };
 </script>
 <style></style>

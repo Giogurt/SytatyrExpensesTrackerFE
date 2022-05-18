@@ -210,7 +210,95 @@
                   >
                 </v-col>
                 <v-col cols="6" align="center">
-                  <v-btn elevation="2" rounded>Send by Email</v-btn>
+                  <v-row justify="center">
+                    <v-dialog v-model="dialog" persistent max-width="600px">
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                          color="#6A8CAF"
+                          elevation="2"
+                          rounded
+                          dark
+                          v-bind="attrs"
+                          v-on="on"
+                        >
+                          Send by Email
+                        </v-btn>
+                      </template>
+                      <template>
+                        <v-card>
+                          <v-card-title>
+                            <span class="text-h5">Send report</span>
+                          </v-card-title>
+                          <v-card-text>
+                            <v-container>
+                              <v-form
+                                ref="emailForm"
+                                v-model="valid"
+                                lazy-validation
+                              >
+                                <v-row>
+                                  <v-col cols="12">
+                                    <v-text-field
+                                      v-model="emailFrom"
+                                      name="email"
+                                      :rules="emailFormRules"
+                                      label="From"
+                                      required
+                                    ></v-text-field>
+                                  </v-col>
+                                  <v-col cols="12">
+                                    <v-text-field
+                                      v-model="emailTo"
+                                      name="toEmail"
+                                      :rules="emailFormRules"
+                                      label="To"
+                                      required
+                                    ></v-text-field>
+                                  </v-col>
+                                  <v-col cols="12">
+                                    <v-text-field
+                                      v-model="emailSubject"
+                                      name="subject"
+                                      :rules="emailTextRules"
+                                      label="Subject"
+                                      required
+                                    ></v-text-field>
+                                  </v-col>
+                                </v-row>
+                                <v-row>
+                                  <v-textarea
+                                    v-model="emailText"
+                                    name="emailText"
+                                    label="Email text body"
+                                    value=""
+                                  ></v-textarea>
+                                </v-row>
+                              </v-form>
+                            </v-container>
+                          </v-card-text>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              color="blue darken-1"
+                              rounded
+                              text
+                              @click="dialog = false"
+                            >
+                              Close
+                            </v-btn>
+                            <v-btn
+                              color="blue darken-1"
+                              rounded
+                              text
+                              @click="validate()"
+                            >
+                              Send
+                            </v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </template>
+                    </v-dialog>
+                  </v-row>
                 </v-col>
               </v-row>
             </v-container>
@@ -218,8 +306,13 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-container />
-    <v-container />
+    <v-alert v-if="successAlert===true"
+      type="success"
+      text
+      dismissible
+    >
+      Success! The email has been sent to the mail.
+    </v-alert>
     <v-container />
   </div>
 </template>
@@ -233,6 +326,9 @@ export default {
     monthExpenses: [],
   },
   data: () => ({
+    dialog: false,
+    successAlert: false,
+    // Variables used for selection of options of dates
     items: ["Report by Day", "Report by Month"],
     reportDate: "Report by Day",
     overview: {
@@ -244,10 +340,32 @@ export default {
       highestExpense: 999,
       lowestExpense: 1,
     },
+    // Variables used for validation of the content for an email
+    valid: true,
+    emailFrom: "",
+    emailTo: "",
+    emailFormRules: [
+      v => !!v || "E-mail is required",
+      v => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ],
+    emailSubject: "",
+    emailTextRules: [
+      v => !!v || "Subject is required",
+      v => (v && v.length >= 10) || "Subject must be greater than 10 characters",
+    ],
+    emailText: "",
   }),
   methods: {
+    // Method used to generate the pdfs, after pressing the button of "export to pdf" for example.
     generateReport() {
       this.$refs.html2Pdf.generatePdf();
+    },
+    // Method used to validate the inputs of the email form in the dialog.
+    validate() {
+      if(this.$refs.emailForm.validate()) {
+        this.dialog = false;
+        this.successAlert = true;
+      } 
     },
   },
   components: {
