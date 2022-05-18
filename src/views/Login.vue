@@ -10,11 +10,11 @@
       </blockquote>
       <h3 class="login-subtitle2">$</h3>
 
-      <form class="form-group">
+      <form class="form-group" >
         <div class="mx-auto">
           <v-icon x-large class="user-icon">{{ icons.mdiAccount }}</v-icon>
           <input
-            v-model="userLogin"
+            v-model="username"
             type="user"
             class="email-input"
             placeholder="Username"
@@ -24,7 +24,7 @@
         <div class="mx-auto">
           <v-icon large class="lock-icon">{{ icons.mdiLock }}</v-icon>
           <input
-            v-model="passwordLogin"
+            v-model="password"
             type="password"
             class="password-input"
             placeholder="Password"
@@ -33,7 +33,7 @@
         </div>
 
         <div class="mx-auto">
-          <v-btn @click="goToHome()" class="login-button">Login</v-btn>
+          <v-btn class="login-button" @click="goToHome()">Login</v-btn>
         </div>
 
         <notificationGroup group="bottom" position="bottom">
@@ -188,6 +188,7 @@
 <script>
 import { mdiAccount, mdiLock, mdiEmail } from "@mdi/js";
 import Modal from "@/components/Modal.vue";
+import axios from "axios";
 
 export default {
   name: "Login",
@@ -196,25 +197,28 @@ export default {
   },
 
   methods: {
-    goToHome() {
-     if (this.userLogin == "admin" && this.passwordLogin == "admin") {
-        this.$router.push({ path: "/expenses" });
-      }
-      if (this.userLogin == null || this.passwordLogin == null) {
+    async goToHome() {
+      if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
       } else {
-        this.invalidNotification();
+         console.log("Hola");
+        const auth = {
+          username: this.username,
+          password: this.password,
+        };
+        // Correct username is 'foo' and password is 'bar'
+        const url = "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
+        this.success = false;
+        this.error = null;
+        try {
+          var res = await axios.get(url, { auth }).then((res) => res.data);
+          console.log(res);
+          this.success = true;
+          this.$router.push({ path: "/expenses" });
+        } catch (err) {
+          this.error = err.message;
+        }
       }
-    },
-    invalidNotification() {
-      this.$notify(
-        {
-          group: "bottom",
-          title: "Error!!!",
-          text: "Invalid Credentials!!!",
-        },
-        4000
-      );
     },
     emptyNotification() {
       this.$notify(
@@ -256,6 +260,10 @@ export default {
       mdiLock,
       mdiEmail,
     },
+    username: "",
+    password: "",
+    error: null,
+    success: false,
   }),
 };
 </script>
