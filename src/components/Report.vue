@@ -179,7 +179,7 @@
                       <tbody>
                         <tr>
                           <td class="text-center">
-                            {{ overview.expensesTotal }}
+                            {{ total }}
                           </td>
                           <td class="text-center">
                             {{ overview.mainRecipient }}
@@ -187,12 +187,14 @@
                           <td class="text-center">
                             {{ overview.mainCategory }}
                           </td>
-                          <td class="text-center">{{ overview.mainMethod }}</td>
                           <td class="text-center">
-                            {{ overview.highestExpense }}
+                            {{ overview.mainMethod }}
+                            </td>
+                          <td class="text-center">
+                            {{ max }}
                           </td>
                           <td class="text-center">
-                            {{ overview.lowestExpense }}
+                            {{ min }}
                           </td>
                         </tr>
                       </tbody>
@@ -325,6 +327,36 @@ export default {
     dayExpenses: [],
     monthExpenses: [],
   },
+  computed: ({
+    max() {
+      let temp = this.expenses[0].amount;
+      this.expenses.forEach((element) => {
+        if (temp < element.amount) {
+          temp = element.amount;
+        }
+      });
+
+      return temp;
+    },
+    min() {
+      let temp = this.expenses[0].amount;
+      this.expenses.forEach((element) => {
+        if (temp > element.amount) {
+          temp = element.amount;
+        }
+      });
+
+      return temp;
+    },
+    total() {
+      let temp = 0;
+      this.expenses.forEach((element) => {
+        temp = temp + element.amount;
+      });
+
+      return temp;
+    },
+  }),
   data: () => ({
     dialog: false,
     successAlert: false,
@@ -371,6 +403,11 @@ export default {
   components: {
     VueHtml2pdf,
   },
+  mounted() {
+    this.max();
+    this.min();
+    this.total();
+  }
 };
 </script>
 <style></style>
