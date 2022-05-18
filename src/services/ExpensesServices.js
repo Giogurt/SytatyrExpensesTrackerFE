@@ -2,7 +2,6 @@ import axios from "axios";
 
 axios.defaults.headers.get['header-name'] = 'value'
 
-
 export const getDailyExpenses = async (token, userId) => {
     const config = {
         headers: {Authorization: "Bearer " + token}

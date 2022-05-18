@@ -210,7 +210,8 @@ export default {
           this.$router.push({ path: "/expenses" });
 
         } catch (err) {
-          this.error = err.message;
+          this.invalidNotification();
+          console.log(err.message);
         }
       }
     },
@@ -230,6 +231,16 @@ export default {
           group: "bottom",
           title: "Error!!!",
           text: "No empty fields!!!",
+        },
+        4000
+      );
+    },
+    invalidNotification() {
+      this.$notify(
+        {
+          group: "top",
+          title: "Error!!!",
+          text: "Invalid Credentials",
         },
         4000
       );
