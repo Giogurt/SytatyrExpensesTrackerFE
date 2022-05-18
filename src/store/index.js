@@ -19,6 +19,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    checkSessionStorage({commit}, payload) {
+      commit("saveToken", payload.token);
+      commit("saveUserId", payload.id);
+    },
     async signIn(context, payload) {
       const url =
         "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
@@ -33,6 +37,8 @@ export default new Vuex.Store({
 
         context.commit("saveToken", res.token.token);
         context.commit("saveUserId", res.id);
+        sessionStorage.token = res.token.token;
+        sessionStorage.id = res.id
 
       } catch (err) {
         console.log(err.message);
@@ -44,5 +50,6 @@ export default new Vuex.Store({
       context.commit("saveUserId", "");   
      }
   },
+  
   modules: {},
 });

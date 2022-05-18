@@ -15,6 +15,16 @@ new Vue({
   data: {
     //
   },
+  methods: {
+    checkSessionStorage() {
+      if (sessionStorage.token && sessionStorage.id) {
+        const payload = { token: sessionStorage.token, id: sessionStorage.id };
+        store.dispatch("checkSessionStorage", payload);
+      }
+    },
+  },
+  mounted() {
+    this.checkSessionStorage();
+  },
   render: (h) => h(App),
-  
 }).$mount("#app");
