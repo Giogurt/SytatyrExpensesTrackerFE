@@ -126,7 +126,8 @@
           <v-container>
             <v-row>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field v-model="recipient" label="Recipient" hint="The entity which is going to recieve the money" required>
+                <v-text-field v-model="recipient" label="Recipient"
+                  hint="The entity which is going to recieve the money" required>
                 </v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
@@ -199,6 +200,8 @@
 <script>
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
+import axios from "axios";
+import { mapState } from 'vuex';
 
 
 export default {
@@ -207,6 +210,12 @@ export default {
     Header,
     Footer
   },
+
+  computed: mapState({
+    token(state){
+      return state.token;
+    }
+  }),
 
   data() {
     return {
@@ -252,10 +261,11 @@ export default {
       dialog2: false,
       picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       categories: ['Housing', 'Food', 'Clothing', 'Peronal Care', 'Automobile', 'Property Tax', 'Utilities',
-      'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses',
-      'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
+        'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses',
+        'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
       paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
-      idForEdition: ''
+      idForEdition: '',
+      userToken: ''
     }
   },
 
@@ -291,15 +301,38 @@ export default {
 
     },
 
-    editExpense(index){
+    editExpense(index) {
       this.dialog2 = true;
       this.recipient = this.expenses[index].recipient;
       this.amount = this.expenses[index].amount;
-      this.reason= this.expenses[index].reason;
+      this.reason = this.expenses[index].reason;
       this.notes = this.expenses[index].notes;
       this.category = this.expenses[index].category;
       this.method = this.expenses[index].method;
       this.picker = this.expenses[index].date;
+    },
+
+    async getAllExpenses() {
+
+      const url =
+        "https://sytatyr-expense-tracker-be.herokuapp.com/expense";
+      this.success = false;
+      this.error = null;
+      try {
+        var res = await axios.post(url, {
+          username: this.username,
+          password: this.password,
+        }).then((res) => res.data);
+        console.log(res.token);
+        this.success = true;
+
+        this.$router.push({ path: "/expenses" });
+        
+
+      } catch (err) {
+        this.error = err.message;
+      }
+
     }
   },
 
@@ -307,7 +340,8 @@ export default {
     this.getMax();
     this.getMin();
     this.getTotal();
-  }
+  },
+
 }
 
 </script>

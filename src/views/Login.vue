@@ -188,7 +188,7 @@
 <script>
 import { mdiAccount, mdiLock, mdiEmail } from "@mdi/js";
 import Modal from "@/components/Modal.vue";
-import axios from "axios";
+
 
 export default {
   name: "Login",
@@ -201,16 +201,14 @@ export default {
       if (this.username == "" || this.password == "") {
         this.emptyNotificationmain();
       } else {
-        const url =
-          "https://sytatyr-expense-tracker-be.herokuapp.com/user/login";
+        
         this.success = false;
         this.error = null;
         try {
-          var res = await axios.post(url, { username: this.username,
-          password: this.password, }).then((res) => res.data);
-          console.log(res);
+          await this.$store.dispatch("signIn", {username: this.username, password: this.password})
           this.success = true;
           this.$router.push({ path: "/expenses" });
+
         } catch (err) {
           this.error = err.message;
         }
