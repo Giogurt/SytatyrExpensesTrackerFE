@@ -184,9 +184,9 @@
           </thead>
           <tbody>
             <tr>
-              <td>$ {{ totalExpenses }}</td>
-              <td>$ {{ highestExpense }}</td>
-              <td>$ {{ lowestExpense }}</td>
+              <td>$ {{ total }}</td>
+              <td>$ {{ max }}</td>
+              <td>$ {{ min }}</td>
 
             </tr>
           </tbody>
@@ -200,8 +200,8 @@
 <script>
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
-import axios from "axios";
 import { mapState } from 'vuex';
+import { getAllExpenses } from '../services/ExpensesServices';
 
 
 export default {
@@ -211,66 +211,16 @@ export default {
     Footer
   },
 
-  computed: mapState({
-    token(state){
-      return state.token;
-    }
-  }),
-
-  data() {
-    return {
-      expenses: [
-        {
-          id: 1,
-          date: "2020-06-04",
-          amount: 100,
-          recipient: "Caffenio",
-          category: "Food",
-          reason: "Tenia hambre",
-          method: "Credit",
-          notes: "No lo haré de nuevo",
-        },
-        {
-          id: 2,
-          date: "2000-08-07",
-          amount: 460,
-          recipient: "Caffenio",
-          category: "Insurance",
-          reason: "Tenia hambre",
-          method: "Debit",
-          notes: "No lo haré de nuevo",
-        },
-        {
-          id: 3,
-          date: "2000-10-02",
-          amount: 250,
-          recipient: "Caffenio",
-          category: "Housing",
-          reason: "Tenia hambre",
-          method: "Cash",
-          notes: "No lo haré de nuevo",
-        },
-      ],
-
-      monthSlection: ['See expenses Today', 'See expenses this Month'],
-
-      highestExpense: '',
-      lowestExpense: '',
-      totalExpenses: '',
-      dialog: false,
-      dialog2: false,
-      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
-      categories: ['Housing', 'Food', 'Clothing', 'Peronal Care', 'Automobile', 'Property Tax', 'Utilities',
-        'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses',
-        'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
-      paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
-      idForEdition: '',
-      userToken: ''
-    }
-  },
-
-  methods: {
-    getMax() {
+  computed: {
+    ...mapState({
+      token(state) {
+        return state.token;
+      },
+      id(state) {
+        return state.userId;
+      }
+    }),
+    max() {
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
         if (temp < element.amount) {
@@ -278,9 +228,9 @@ export default {
         }
       });
 
-      this.highestExpense = temp;
+      return temp;
     },
-    getMin() {
+    min() {
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
         if (temp > element.amount) {
@@ -288,18 +238,43 @@ export default {
         }
       });
 
-      this.lowestExpense = temp;
+      return temp;
 
     },
-    getTotal() {
+    total() {
       let temp = 0;
       this.expenses.forEach((element) => {
         temp = temp + element.amount;
       });
 
-      this.totalExpenses = temp;
+      return temp;
 
     },
+
+  },
+
+  data() {
+    return {
+      expenses: [],
+
+      monthSlection: ['See expenses Today', 'See expenses this Month'],
+
+      highestExpense: '',
+      lowestExpense: '',
+      totalExpenses: '',
+
+      dialog: false,
+      dialog2: false,
+      picker: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      categories: ['Housing', 'Food', 'Clothing', 'Peronal Care', 'Automobile', 'Property Tax', 'Utilities',
+        'Entertainment', 'Unreimursed Business Expenses', 'Alimony (paid)', 'Child Support (paid)', 'Childrens Expenses',
+        'Gifts', 'Charitable Contributions', 'Medical Expenses', 'Insurance', 'Credit cards', 'Other Liabilities'],
+      paymentMethods: ['Credit', 'Debit', 'Cash', 'Check', 'Transfer'],
+      idForEdition: ''
+    }
+  },
+
+  methods: {
 
     editExpense(index) {
       this.dialog2 = true;
@@ -313,34 +288,16 @@ export default {
     },
 
     async getAllExpenses() {
-
-      const url =
-        "https://sytatyr-expense-tracker-be.herokuapp.com/expense";
-      this.success = false;
-      this.error = null;
-      try {
-        var res = await axios.post(url, {
-          username: this.username,
-          password: this.password,
-        }).then((res) => res.data);
-        console.log(res.token);
-        this.success = true;
-
-        this.$router.push({ path: "/expenses" });
-        
-
-      } catch (err) {
-        this.error = err.message;
-      }
+      let response = await getAllExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
 
     }
   },
 
-  mounted: function () {
-    this.getMax();
-    this.getMin();
-    this.getTotal();
-  },
+  async mounted() {
+    await this.getAllExpenses();
+  }
 
 }
 

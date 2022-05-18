@@ -35,8 +35,8 @@ export default new Vuex.Store({
         context.commit("saveUserId", res.id);
 
       } catch (err) {
-
         console.log(err.message);
+        throw new Error("Invalid credentials");
       }
     }
   },

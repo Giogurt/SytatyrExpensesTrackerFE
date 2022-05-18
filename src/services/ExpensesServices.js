@@ -2,14 +2,30 @@ import axios from "axios";
 
 axios.defaults.headers.get['header-name'] = 'value'
 
-export const getDailyExpenses = async () => {
-    axios
-        .get('https://api.coindesk.com/v1/bpi/currentprice.json')
-        .then(response => (console.log(response)));
+
+export const getDailyExpenses = async (token, userId) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
+    return axios
+        .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/day/${userId}`, config)
+        .then(response => (response.data));
 }
 
-export const getMonthlyExpenses = async () => {
+export const getAllExpenses = async (token, userId) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
+    return axios
+        .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/all/${userId}`, config)
+        .then(response => (response.data));
+}
+
+export const getMonthlyExpenses = async (token, userId) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
     axios
-        .get('https://sytatyr-expense-tracker-be.herokuapp.com/expenses/0')
-        .then(response => (console.log(response)));
+        .get(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/all/${userId}`, config)
+        .then(response => (response.data));
 }
