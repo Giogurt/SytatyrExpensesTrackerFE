@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header/>
-    <Report :expenses="dayExpenses" :monthExpenses="monthExpenses"/>
+    <Report/>
     <Footer/>
   </div>
 </template>
@@ -10,38 +10,14 @@
 import Header from "@/components/Header.vue";
 import Report from "@/components/Report.vue";
 import Footer from "@/components/Footer.vue";
-import { mapState } from "vuex";
-import { getDailyExpenses } from "@/services/ExpensesServices.js";
 
 export default {
   name: "Reports",
   components: { Header, Report, Footer },
-  computed: mapState({
-    token(state){
-      return state.token;
-    },
-    id(state){
-      return state.userId;
-    }
-  }),
-
-  data: () => ({
-    dayExpenses: [],  
-    monthExpenses: []
-  }),
-
-  methods: {
-    async getDayExpenses() {
-      let response = await getDailyExpenses(this.token, this.id);
-      this.dayExpenses = response;
-      console.log(response);
-    },
-
-  },
   
-  async created() {
-    await this.getDayExpenses();
-  },
+  data: () => ({
+    //
+  }),
 };
 </script>
 <style></style>

@@ -6,7 +6,7 @@
           <v-container fluid>
             <v-select
               v-model="reportDate"
-              :items="items"
+              :items="dates"
               label="Select by day or month"
               solo
             ></v-select>
@@ -27,7 +27,9 @@
               ref="html2Pdf"
             >
               <section slot="pdf-content">
-                <v-container v-if="reportDate === 'Report by Day'">
+                <v-container >
+                  <h2>{{currentDate}}</h2>
+                  <v-container />
                   <v-divider />
                   <v-simple-table absolute="true">
                     <template v-slot:default>
@@ -63,96 +65,7 @@
                   </v-simple-table>
                   <v-divider />
                 </v-container>
-                <v-container v-if="reportDate === 'Report by Day'">
-                  <v-divider />
-                  <v-simple-table absolute="true">
-                    <template v-slot:default>
-                      <thead>
-                        <tr>
-                          <th id="tableExpensesTotal" class="text-center">
-                            Expenses Total
-                          </th>
-                          <th id="tableMainRecipient" class="text-center">
-                            Main Recipient
-                          </th>
-                          <th id="tableMainCategory" class="text-center">
-                            Main Category
-                          </th>
-                          <th id="tableMainMethod" class="text-center">
-                            Main Method
-                          </th>
-                          <th id="tableHighestExpense" class="text-center">
-                            Highest Expense
-                          </th>
-                          <th id="tableLowestExpense" class="text-center">
-                            Lowest Expense
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td class="text-center">
-                            {{ total }}
-                          </td>
-                          <td class="text-center">
-                            {{ mainRecipient }}
-                          </td>
-                          <td class="text-center">
-                            {{ mainCategory }}
-                          </td>
-                          <td class="text-center">
-                            {{ mainMethod }}
-                          </td>
-                          <td class="text-center">
-                            {{ max }}
-                          </td>
-                          <td class="text-center">
-                            {{ min }}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                  <v-divider />
-                </v-container>
-
-                <v-container v-if="reportDate === 'Report by Month'">
-                  <v-divider />
-                  <v-simple-table absolute="true">
-                    <template v-slot:default>
-                      <thead>
-                        <tr>
-                          <th id="tableDate" class="text-center">Date</th>
-                          <th id="tableAmount" class="text-center">Amount</th>
-                          <th id="tableRecipient" class="text-center">
-                            Recipient
-                          </th>
-                          <th id="tableCategory" class="text-center">
-                            Category
-                          </th>
-                          <th id="tableReason" class="text-center">Reason</th>
-                          <th id="tableMethod" class="text-center">Method</th>
-                          <th id="tableNotes" class="text-center">Notes</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="item in monthExpenses" :key="item.id">
-                          <td class="text-center !important">
-                            {{ item.date }}
-                          </td>
-                          <td class="text-center">{{ item.amount }}</td>
-                          <td class="text-center">{{ item.recipient }}</td>
-                          <td class="text-center">{{ item.category }}</td>
-                          <td class="text-center">{{ item.reason }}</td>
-                          <td class="text-center">{{ item.method }}</td>
-                          <td class="text-center">{{ item.notes }}</td>
-                        </tr>
-                      </tbody>
-                    </template>
-                  </v-simple-table>
-                  <v-divider />
-                </v-container>
-                <v-container v-if="reportDate === 'Report by Month'">
+                <v-container>
                   <v-divider />
                   <v-simple-table absolute="true">
                     <template v-slot:default>
@@ -319,14 +232,28 @@
 
 <script>
 import VueHtml2pdf from "vue-html2pdf";
+import { mapState } from "vuex";
+import {
+  getDailyExpenses,
+  getMonthlyExpenses,
+} from "@/services/ExpensesServices.js";
 export default {
   name: "Report",
-  props: {
-    expenses: [],
-    monthExpenses: [],
-  },
+
   computed: {
+    ...mapState({
+      token(state) {
+        return state.token;
+      },
+      id(state) {
+        return state.userId;
+      },
+    }),
     max() {
+      if(this.expenses.length == 0) {
+        return null;
+      }
+      
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
         if (temp < element.amount) {
@@ -337,6 +264,10 @@ export default {
       return temp;
     },
     min() {
+      if(this.expenses.length == 0) {
+        return null;
+      }
+
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
         if (temp > element.amount) {
@@ -347,6 +278,10 @@ export default {
       return temp;
     },
     total() {
+      if(this.expenses.length == 0) {
+        return null;
+      }
+
       let temp = 0;
       this.expenses.forEach((element) => {
         temp = temp + element.amount;
@@ -355,24 +290,24 @@ export default {
       return temp;
     },
     mainMethod() {
-      if (this.expenses.length == 0) 
+      if (this.expenses.length == 0) {
         return null;
+      }
 
       var expensesMethods = [];
 
       this.expenses.forEach((element) => {
         expensesMethods.push(element.method);
-      })
+      });
 
       var modeMap = {};
-      var maxElement = expensesMethods[0], maxCount = 1;
+      var maxElement = expensesMethods[0],
+        maxCount = 1;
 
       for (var i = 0; i < expensesMethods.length; i++) {
         var elementExpense = expensesMethods[i];
-        if (modeMap[elementExpense] == null) 
-          modeMap[elementExpense] = 1;
-        else 
-          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] == null) modeMap[elementExpense] = 1;
+        else modeMap[elementExpense]++;
         if (modeMap[elementExpense] > maxCount) {
           maxElement = elementExpense;
           maxCount = modeMap[elementExpense];
@@ -382,24 +317,24 @@ export default {
       return maxElement;
     },
     mainRecipient() {
-      if (this.expenses.length == 0) 
+      if (this.expenses.length == 0) {
         return null;
+      }
 
       var expensesRecipients = [];
 
       this.expenses.forEach((element) => {
         expensesRecipients.push(element.recipient);
-      })
+      });
 
       var modeMap = {};
-      var maxElement = expensesRecipients[0], maxCount = 1;
+      var maxElement = expensesRecipients[0],
+        maxCount = 1;
 
       for (var i = 0; i < expensesRecipients.length; i++) {
         var elementExpense = expensesRecipients[i];
-        if (modeMap[elementExpense] == null) 
-          modeMap[elementExpense] = 1;
-        else 
-          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] == null) modeMap[elementExpense] = 1;
+        else modeMap[elementExpense]++;
         if (modeMap[elementExpense] > maxCount) {
           maxElement = elementExpense;
           maxCount = modeMap[elementExpense];
@@ -409,24 +344,24 @@ export default {
       return maxElement;
     },
     mainCategory() {
-      if (this.expenses.length == 0) 
+      if (this.expenses.length == 0) {
         return null;
+      }
 
       var expensesCategories = [];
 
       this.expenses.forEach((element) => {
         expensesCategories.push(element.category);
-      })
+      });
 
       var modeMap = {};
-      var maxElement = expensesCategories[0], maxCount = 1;
+      var maxElement = expensesCategories[0],
+        maxCount = 1;
 
       for (var i = 0; i < expensesCategories.length; i++) {
         var elementExpense = expensesCategories[i];
-        if (modeMap[elementExpense] == null) 
-          modeMap[elementExpense] = 1;
-        else 
-          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] == null) modeMap[elementExpense] = 1;
+        else modeMap[elementExpense]++;
         if (modeMap[elementExpense] > maxCount) {
           maxElement = elementExpense;
           maxCount = modeMap[elementExpense];
@@ -436,11 +371,14 @@ export default {
       return maxElement;
     },
   },
+
   data: () => ({
+    currentDate: "Report of " + new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate(),
+    expenses: [],
     dialog: false,
     successAlert: false,
     // Variables used for selection of options of dates
-    items: ["Report by Day", "Report by Month"],
+    dates: ["Report by Day", "Report by Month"],
     reportDate: "Report by Day",
     // Variables used for validation of the content for an email
     valid: true,
@@ -458,6 +396,7 @@ export default {
     ],
     emailText: "",
   }),
+
   methods: {
     // Method used to generate the pdfs, after pressing the button of "export to pdf" for example.
     generateReport() {
@@ -470,17 +409,36 @@ export default {
         this.successAlert = true;
       }
     },
+    async getDayExpenses() {
+      let response = await getDailyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
+    },
+    async getMonthExpenses() {
+      let response = await getMonthlyExpenses(this.token, this.id);
+      this.expenses = response;
+      console.log(response);
+    },
   },
+
   components: {
     VueHtml2pdf,
   },
-  mounted() {
-    this.max();
-    this.min();
-    this.total();
-    this.mainMethod();
-    this.mainRecipient();
-    this.mainCategory();
+
+  watch: {
+    reportDate(date) {
+      if (date == "Report by Day") {
+        this.currentDate = "Report of " + new Date().getFullYear() + "-" + new Date().getMonth() + "-" + new Date().getDate()
+        this.getDayExpenses()
+      } else if (date == "Report by Month") {
+        this.currentDate = "Report of " + new Date().getFullYear() + "-" + new Date().getMonth()
+        this.getMonthExpenses()
+      }
+    },
+  },
+
+  async mounted() {
+    await this.getDayExpenses();
   },
 };
 </script>
