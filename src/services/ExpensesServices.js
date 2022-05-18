@@ -63,3 +63,12 @@ export const updateExpense = async (token, expenseId, recipient, amount, reason,
         }, config)
         .then(response => (response.data));
 }
+
+export const deleteExpense = async (token, expenseId) => {
+    const config = {
+        headers: {Authorization: "Bearer " + token}
+    }
+    return axios
+        .delete(`https://sytatyr-expense-tracker-be.herokuapp.com/expense/${expenseId}`, config)
+        .then(response => (response.data));
+}

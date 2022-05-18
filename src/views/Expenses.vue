@@ -57,7 +57,7 @@
               <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)" @click="editExpense(index)">
                 <v-icon>mdi-pencil</v-icon>
               </v-btn>
-              <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)">
+              <v-btn class="ma-2" outlined small fab color="rgb(106, 140, 175)" @click="deleteExpense(index)">
                 <v-icon>mdi-trash-can</v-icon>
               </v-btn>
             </tr>
@@ -199,7 +199,7 @@
 import Footer from '../components/Footer.vue'
 import Header from '../components/Header.vue'
 import { mapState } from 'vuex';
-import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense, updateExpense} from '../services/ExpensesServices';
+import { getAllExpenses, getDailyExpenses, getMonthlyExpenses, addNewEspense, updateExpense, deleteExpense} from '../services/ExpensesServices';
 
 
 export default {
@@ -331,6 +331,13 @@ export default {
       let response = await updateExpense(this.token, this.expenseId, this.recipient, this.amount, this.reason, this.category, this.method, this.picker, this.notes);
       this.dialog2 = false;
       console.log(response);
+    },
+
+    async deleteExpense(index) {
+      this.expenseId = this.expenses[index].id;
+      let response = await deleteExpense(this.token, this.expenseId);
+      console.log(response);
+      this.$router.go();
     },
 
 
