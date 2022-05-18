@@ -1,7 +1,7 @@
 <template>
   <div>
     <Header/>
-    <Report :dayExpenses="dayExpenses" :monthExpenses="monthExpenses"/>
+    <Report :expenses="dayExpenses" :monthExpenses="monthExpenses"/>
     <Footer/>
   </div>
 </template>
@@ -11,7 +11,7 @@ import Header from "@/components/Header.vue";
 import Report from "@/components/Report.vue";
 import Footer from "@/components/Footer.vue";
 import { mapState } from "vuex";
-import { getAllExpenses } from "@/services/ExpensesServices.js";
+import { getDailyExpenses } from "@/services/ExpensesServices.js";
 
 export default {
   name: "Reports",
@@ -32,7 +32,7 @@ export default {
 
   methods: {
     async getDayExpenses() {
-      let response = await getAllExpenses(this.token, this.id);
+      let response = await getDailyExpenses(this.token, this.id);
       this.dayExpenses = response;
       console.log(response);
     },

@@ -47,7 +47,7 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="item in dayExpenses" :key="item.id">
+                        <tr v-for="item in expenses" :key="item.id">
                           <td class="text-center !important">
                             {{ item.date }}
                           </td>
@@ -92,20 +92,22 @@
                       <tbody>
                         <tr>
                           <td class="text-center">
-                            {{ overview.expensesTotal }}
+                            {{ total }}
                           </td>
                           <td class="text-center">
-                            {{ overview.mainRecipient }}
+                            {{ mainRecipient }}
                           </td>
                           <td class="text-center">
-                            {{ overview.mainCategory }}
-                          </td>
-                          <td class="text-center">{{ overview.mainMethod }}</td>
-                          <td class="text-center">
-                            {{ overview.highestExpense }}
+                            {{ mainCategory }}
                           </td>
                           <td class="text-center">
-                            {{ overview.lowestExpense }}
+                            {{ mainMethod }}
+                          </td>
+                          <td class="text-center">
+                            {{ max }}
+                          </td>
+                          <td class="text-center">
+                            {{ min }}
                           </td>
                         </tr>
                       </tbody>
@@ -182,14 +184,14 @@
                             {{ total }}
                           </td>
                           <td class="text-center">
-                            {{ overview.mainRecipient }}
+                            {{ mainRecipient }}
                           </td>
                           <td class="text-center">
-                            {{ overview.mainCategory }}
+                            {{ mainCategory }}
                           </td>
                           <td class="text-center">
-                            {{ overview.mainMethod }}
-                            </td>
+                            {{ mainMethod }}
+                          </td>
                           <td class="text-center">
                             {{ max }}
                           </td>
@@ -308,11 +310,7 @@
         </v-col>
       </v-row>
     </v-container>
-    <v-alert v-if="successAlert===true"
-      type="success"
-      text
-      dismissible
-    >
+    <v-alert v-if="successAlert === true" type="success" text dismissible>
       Success! The email has been sent to the mail.
     </v-alert>
     <v-container />
@@ -324,10 +322,10 @@ import VueHtml2pdf from "vue-html2pdf";
 export default {
   name: "Report",
   props: {
-    dayExpenses: [],
+    expenses: [],
     monthExpenses: [],
   },
-  computed: ({
+  computed: {
     max() {
       let temp = this.expenses[0].amount;
       this.expenses.forEach((element) => {
@@ -356,34 +354,107 @@ export default {
 
       return temp;
     },
-  }),
+    mainMethod() {
+      if (this.expenses.length == 0) 
+        return null;
+
+      var expensesMethods = [];
+
+      this.expenses.forEach((element) => {
+        expensesMethods.push(element.method);
+      })
+
+      var modeMap = {};
+      var maxElement = expensesMethods[0], maxCount = 1;
+
+      for (var i = 0; i < expensesMethods.length; i++) {
+        var elementExpense = expensesMethods[i];
+        if (modeMap[elementExpense] == null) 
+          modeMap[elementExpense] = 1;
+        else 
+          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] > maxCount) {
+          maxElement = elementExpense;
+          maxCount = modeMap[elementExpense];
+        }
+      }
+
+      return maxElement;
+    },
+    mainRecipient() {
+      if (this.expenses.length == 0) 
+        return null;
+
+      var expensesRecipients = [];
+
+      this.expenses.forEach((element) => {
+        expensesRecipients.push(element.recipient);
+      })
+
+      var modeMap = {};
+      var maxElement = expensesRecipients[0], maxCount = 1;
+
+      for (var i = 0; i < expensesRecipients.length; i++) {
+        var elementExpense = expensesRecipients[i];
+        if (modeMap[elementExpense] == null) 
+          modeMap[elementExpense] = 1;
+        else 
+          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] > maxCount) {
+          maxElement = elementExpense;
+          maxCount = modeMap[elementExpense];
+        }
+      }
+
+      return maxElement;
+    },
+    mainCategory() {
+      if (this.expenses.length == 0) 
+        return null;
+
+      var expensesCategories = [];
+
+      this.expenses.forEach((element) => {
+        expensesCategories.push(element.category);
+      })
+
+      var modeMap = {};
+      var maxElement = expensesCategories[0], maxCount = 1;
+
+      for (var i = 0; i < expensesCategories.length; i++) {
+        var elementExpense = expensesCategories[i];
+        if (modeMap[elementExpense] == null) 
+          modeMap[elementExpense] = 1;
+        else 
+          modeMap[elementExpense]++;
+        if (modeMap[elementExpense] > maxCount) {
+          maxElement = elementExpense;
+          maxCount = modeMap[elementExpense];
+        }
+      }
+
+      return maxElement;
+    },
+  },
   data: () => ({
     dialog: false,
     successAlert: false,
     // Variables used for selection of options of dates
     items: ["Report by Day", "Report by Month"],
     reportDate: "Report by Day",
-    overview: {
-      id: 0,
-      expensesTotal: 1000,
-      mainRecipient: "Walmart",
-      mainCategory: "Carros",
-      mainMethod: "Fisico",
-      highestExpense: 999,
-      lowestExpense: 1,
-    },
     // Variables used for validation of the content for an email
     valid: true,
     emailFrom: "",
     emailTo: "",
     emailFormRules: [
-      v => !!v || "E-mail is required",
-      v => /.+@.+\..+/.test(v) || "E-mail must be valid",
+      (v) => !!v || "E-mail is required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
     ],
     emailSubject: "",
     emailTextRules: [
-      v => !!v || "Subject is required",
-      v => (v && v.length >= 10) || "Subject must be greater than 10 characters",
+      (v) => !!v || "Subject is required",
+      (v) =>
+        (v && v.length >= 10) || "Subject must be greater than 10 characters",
     ],
     emailText: "",
   }),
@@ -394,10 +465,10 @@ export default {
     },
     // Method used to validate the inputs of the email form in the dialog.
     validate() {
-      if(this.$refs.emailForm.validate()) {
+      if (this.$refs.emailForm.validate()) {
         this.dialog = false;
         this.successAlert = true;
-      } 
+      }
     },
   },
   components: {
@@ -407,7 +478,10 @@ export default {
     this.max();
     this.min();
     this.total();
-  }
+    this.mainMethod();
+    this.mainRecipient();
+    this.mainCategory();
+  },
 };
 </script>
 <style></style>
